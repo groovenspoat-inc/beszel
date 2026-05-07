@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: beszel\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-05-05 08:16\n"
+"PO-Revision-Date: 2026-05-07 01:51\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -858,7 +858,7 @@ msgstr "全局"
 
 #: src/components/routes/system.tsx
 msgid "GPU"
-msgstr ""
+msgstr "显卡"
 
 #: src/components/routes/system/charts/gpu-charts.tsx
 msgid "GPU Engines"
@@ -1697,7 +1697,7 @@ msgstr "每个接口的总发送数据量"
 #: src/components/routes/system/disk-io-sheet.tsx
 msgctxt "Disk I/O"
 msgid "Total time spent on read/write (can exceed 100%)"
-msgstr ""
+msgstr "读写操作总耗时（可超过 100%）"
 
 #. placeholder {0}: data.length
 #: src/components/systemd-table/systemd-table.tsx
