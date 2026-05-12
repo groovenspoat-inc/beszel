@@ -1,0 +1,45 @@
+#!/bin/sh
+# pre-commit guard for this fork.
+# Two layers:
+#   1. gitleaks scan of staged content against repo .gitleaks.toml
+#   2. plaintext denylist scan against a host-local file outside the repo
+#
+# Block the commit on any hit. Install once with `scripts/install-hooks.ps1`
+# (sets core.hooksPath=.githooks).
+
+set -e
+
+repo_root="$(git rev-parse --show-toplevel)"
+denylist_default="${HOME}/.beszel-denylist.txt"
+denylist="${BESZEL_DENYLIST:-$denylist_default}"
+
+# 1. gitleaks
+if command -v gitleaks >/dev/null 2>&1; then
+    gitleaks protect --staged --no-banner --redact --config="${repo_root}/.gitleaks.toml" \
+        || { echo ""; echo "pre-commit: gitleaks rejected staged content."; exit 1; }
+else
+    echo "pre-commit: WARNING - gitleaks not on PATH, skipping rule scan." >&2
+fi
+
+# 2. personal denylist
+if [ -f "$denylist" ]; then
+    staged_diff="$(git diff --cached -U0)"
+    if [ -n "$staged_diff" ]; then
+        while IFS= read -r line || [ -n "$line" ]; do
+            case "$line" in
+                ""|"#"*) continue ;;
+            esac
+            if printf '%s' "$staged_diff" | grep -F -i -- "$line" >/dev/null 2>&1; then
+                echo ""
+                echo "pre-commit: personal denylist HIT in staged diff:"
+                echo "  pattern from $denylist matched (redacted)"
+                echo "  Remove the value or set BESZEL_DENYLIST=/dev/null to bypass once."
+                exit 1
+            fi
+        done < "$denylist"
+    fi
+else
+    echo "pre-commit: NOTE - no personal denylist at $denylist (skipping)." >&2
+fi
+
+exit 0
